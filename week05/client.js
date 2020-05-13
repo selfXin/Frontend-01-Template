@@ -24,6 +24,7 @@ ${Object.keys(this.headers).map(key=>`${key}:${this.headers[key]}`).join('\r\n')
 \r
 ${this.bodyText}`
     }
+    
 
     send(connection) {
         let parser = new ResponseParser();
