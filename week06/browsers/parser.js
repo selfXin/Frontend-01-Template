@@ -1,33 +1,12 @@
 
-const html = `<html lang="en">
-<head>
-	<meta charset="UTF-8"/>
-	<title>Document</title>
-	<style>
-		.container {
-
-		}
-		span {
-			display: inline-block;
-		}
-		#btn {
-			background-color: red;
-		}
-	</style>
-</head>
-<body>
-	<div class="container">
-		<button id="btn">按钮</button>
-		<img src='http://www.baidu.com'/>
-		<span></span>	
-	</div>
-</body>
-</html>`
-
+const CssTool = require('./addCssRules.js');
 const EOF = Symbol('EOF');
 let currentToken = null;
 let currentAttribute = null;
 let currentTextNode = null;
+
+let cssTool = new CssTool.CssTool();
+
 
 let stack = [{type:'document',children:[]}]
 
@@ -49,16 +28,28 @@ function emit(token){
 			});
 		}
 	}
+
+
+
+
 	top.children.push(element);
 	element.parent = top;
+
+
 	if(!token.isSelfClosing)
 		stack.push(element);
+
+	
+	cssTool.computeCss(element,stack);
 	currentTextNode = null;
 
 	}else if(token.type == 'endTag'){
 		if(top.tagName !=token.tagName){
 			throw new Error("Tag start end doesn't match");
 		}else{
+			if(top.tagName === 'style'){
+				cssTool.addCssRules(top.children[0].content);
+			}
 			stack.pop();
 		}
 		currentTextNode = null;
