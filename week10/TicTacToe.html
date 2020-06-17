@@ -1,25 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            position: relative;
+            width: 400px;
+        }
+        .block {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background-color: green;
+            float: left;
+            margin: 5px;
+            text-align: center;
+            line-height: 100px;
+            font-size: 50px;
+        }
+        .i-o:before {
+            left: 0;
+            top: 0;
+            content: '⭕️';
+        }
+
+        .i-x:before {
+            left: 0;
+            top: 0;
+            content: '❌';
+        }
+    </style>
 </head>
 <body>
-	
-	<div style="font-size:50px;line-height:100px;background-color:pink;">
-    <div style="vertical-align:text-bottom;overflow:visible;display:inline-block;width:1px;height:1px;">
-        <div style="width:1000px;;height:1px;background:red;"></div>
+    <div class="container" id='container'>
     </div>
-    <div style="vertical-align:text-top;overflow:visible;display:inline-block;width:1px;height:1px;">
-        <div style="width:1000px;;height:1px;background:red;"></div>
-    </div>
-    <span>Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello </span>
-    <div style="vertical-align:text-bottom;line-height:70px;width:100px;height:150px;background-color:aqua;display:inline-block">1</div>
-    <div style="vertical-align:top;line-height:70px;width:100px;height:50px;background-color:aqua;display:inline-block">1</div>
-    <div style="vertical-align:base-line;line-height:70px;width:100px;height:550px;background-color:plum;display:inline-block">1</div>
 
+    <script>
+        //1为❌，2位⭕️
+        let pattern = [
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        ]   
+        let num = 1;
 
-</div>
+        let container = document.getElementById('container');
+        let children = document.getElementById('container').children;
+        show();
+        function show(bool){
+            for(let i=0; i<3;i++){
+                for(let j=0; j<3;j++){
+                    let index = i*3+j;
+                    let cell;
+                    if(!bool){
+                        cell = document.createElement('div');
+                        cell.addEventListener('click',()=>move(i,j))
+                        container.appendChild(cell);
+                    }else{
+                        cell = children[index];
+                    }
 
+                    let className = 'block'
+                    if(pattern[i][j]==2){
+                        className += ' i-x';
+                    }else if(pattern[i][j]==1){
+                        className += ' i-o';
+                    }
+                    cell.className = className;
+
+                }
+            }
+        }
+
+        function move(x,y){
+            if(pattern[x][y]!=0) 
+                return;
+            pattern[x][y] = num;
+            if(check(pattern,num)){
+                alert(num==2?'❌win':'⭕️win')
+            }
+            show(true);
+            num = 3 - num;
+            let best = bestChoice(pattern,num);
+            console.log(best)
+            if(willWin(pattern,num)){
+                console.log(num==2?'❌win':'⭕️win')
+            }
+
+        }
+
+        function check(pattern,color){
+            let h = getCheckResult(pattern,color,'h'),
+                v = getCheckResult(pattern,color,'v'),
+                l = getCheckResult(pattern,color,'l'),
+                r = getCheckResult(pattern,color,'r');
+            if(h || v || l || r){
+                return true;
+            }
+            return false;
+        }
+
+        function clone(pattern){
+            return JSON.parse(JSON.stringify(pattern));
+        }
+
+        function willWin(pattern,color){
+            for(let i=0;i<3;i++){
+                for(let j=0;j<3;j++){
+                    if(pattern[i][j]!==0)
+                        continue;
+                    let tem = clone(pattern);
+                    tem[i][j] = color;
+                    if(check(tem,color)){
+                        return [j,i];
+                    }
+                }
+            }
+            return null;
+        }
+
+        function bestChoice(pattern,color){
+            let point = willWin(pattern,color);
+            if(point){
+                return {
+                    point:point,
+                    result:1
+                }
+            }
+            let result = -1;
+            for(let i=0;i<3;i++){
+                for(let j=0;j<3;j++){
+                    if(pattern[i][j]!==0)
+                        continue;
+                    let tem = clone(pattern);
+                    tem[i][j] = color;
+                    let opp =bestChoice(tem,3-color);
+                    if(-opp.result>=result){
+                        point = [j,i];
+                        result = -opp.result;
+                    }
+                }
+            }
+            return {
+                point:point,
+                result:point?result:0
+            }
+        }
+
+        //判断赢了-4种类型-横/竖立/正斜/反斜
+        function getCheckResult(pattern,color,type){
+            let cx,cy;
+            for(let i=0; i<3;i++){
+                let win = true;
+                for(let j=0;j<3;j++){
+                    if(type=='h'){
+                        cx = i;
+                        cy = j;
+                    }else if(type=='v'){
+                        cx = j;
+                        cy = i;
+                    }else if(type=='l'){
+                        cx = j;
+                        cy = j;
+                    }else if(type=='r'){
+                        cx = j;
+                        cy = 2-j;
+                    }
+                    if(pattern[cx][cy]!==color){
+                        win = false;
+                        break;
+                    }
+                }
+                if(win){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    </script>
 </body>
 </html>
+
+
