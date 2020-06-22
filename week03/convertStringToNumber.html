@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		function convertStringToNumber(string,x = 10){
+			var charts = string.split('');
+			var number = 0;
+
+			var i=0;
+			var other = 0;
+			var startCode = '0';
+			if(x == 16){
+				startCode = 'a';
+				x = 16;
+				other = 10;
+			}
+
+			while(i<charts.length && charts[i] != '.'){
+				number = number*x;
+				number += charts[i].codePointAt(0) - startCode.codePointAt(0) + other;
+				i++
+			}
+
+
+			var fraction = 1;
+			if(charts[i] == '.')
+				i++;
+
+			while(i<charts.length){				
+				fraction = fraction/x;
+				number += (charts[i].codePointAt(0) - '0'.codePointAt(0))*fraction;
+				i++;
+			}
+			return number;
+		}
+	</script>
+</body>
+</html>

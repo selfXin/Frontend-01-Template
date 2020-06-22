@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		function convertNumberToString(number,x = 10){
+			var pointLen = 5;
+			var integer = Math.floor(number)
+			var fraction = number - integer;
+			var string = '';
+
+			while(integer > 0){
+				string = integer%x + string;
+				integer = Math.floor(integer/x);
+			}
+
+			if(fraction < 1){
+				string+= '.';
+			}
+			let count = 0;
+			while(fraction >= 0 && count < pointLen){
+				count++;
+				fraction = fraction*x
+				string += Math.floor(fraction);
+				fraction = fraction - Math.floor(fraction);
+			}
+			return string;
+		}
+
+	</script>
+</body>
+</html>
