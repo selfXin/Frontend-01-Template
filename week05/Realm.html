@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="https://echarts.apache.org/examples/vendors/echarts/echarts.min.js"></script>
+
+	<style>
+		.container {
+			width: 1000px;
+			height: 600px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container" id="container">
+		
+	</div>
+	<script>
+		var queues = [
+			"eval",
+			"isFinite",
+			"isNaN",
+			"parseFloat",
+			"parseInt",
+			"decodeURI",
+			"decodeURIComponent",
+			"encodeURI",
+			"encodeURIComponent",
+			"Array",
+			"Date",
+			"RegExp",
+			"Promise",
+			"Proxy", 
+			"Map",
+			"WeakMap", 
+			"Set",
+			"WeakSet",
+			"Function",
+			"Boolean",
+			"String",
+			"Number",
+			"Symbol",
+			"Object",
+			"Error",
+			"EvalError",
+			"RangeError", 
+			"ReferenceError", 
+			"SyntaxError",
+			"TypeError", 
+			"URIError", 
+			"ArrayBuffer", 
+			"SharedArrayBuffer", 
+			"DataView", 
+			"Float32Array", 
+			"Float64Array", 
+			"Int8Array", 
+			"Int16Array", 
+			"Int32Array", 
+			"Uint8Array", 
+			"Uint16Array", 
+			"Uint32Array", 
+			"Uint8ClampedArray", 
+			"Atomics", 
+			"JSON",
+			"Math",
+			"Reflect"
+		];
+
+		var queue = [];
+		for(var p of queues){
+			queue.push({
+				path:[p],
+				object:this[p]
+			})
+		}
+
+
+		var set = new Set();
+		let current;
+		let dataGra = {
+			id:'window',
+			name:'window',
+			children:[]
+		}
+
+		var nodesList = {
+			nodes:[],
+			edges:[]
+		}
+		var colorList = ['red','green','blue','purple','yellow'];
+		nodesList.nodes.push({
+			id:'window',
+			name:'window',
+			label:'window',
+			symbolSize:40,
+			itemStyle:{
+				color:colorList[0]
+			}
+		});
+		while(queue.length){
+			current = queue.shift();
+			getResult(current,dataGra.children);
+		}
+
+		function getResult(current){
+			if(set.has(current.object))
+				return;
+			set.add(current.object);
+			let node = {
+				id:current.path.join('.'),
+				name:current.path[current.path.length-1],
+				symbolSize:5+((1-current.path.length/3)*20),
+				itemStyle:{
+					color:colorList[current.path.length]
+				}
+			};
+			nodesList.nodes.push(node);
+			if(current.path.length == 1){
+				node.label = node.name
+				nodesList.edges.push({
+					source:'window',
+					target:node.id
+				})
+			}
+
+			for(let p of Object.getOwnPropertyNames(current.object)){
+				var property = Object.getOwnPropertyDescriptor(current.object,p);
+				let result = {}
+
+				if(property.hasOwnProperty('value')  && property.value instanceof Object){
+					getProperty(current,p,property,node,'value');
+				}
+				if(property.hasOwnProperty('get') && (typeof property.get == "function")){
+					getProperty(current,p,property,node,'get');
+				}
+				// if(property.hasOwnProperty('set') && (typeof property.set == "function")){
+				// 	getProperty(current,p,property,node,'set');
+				// }
+			}
+		}
+
+		function getProperty(current,p,property,node,value){
+			result = {
+				path:current.path.concat([p]),
+				object:property[value]
+			};
+			nodesList.edges.push({
+				source:node.id,
+				target:result.path.join('.')
+			})
+			if(property[value]){
+				getResult(result)
+			}
+		}
+
+	</script>
+	<script>
+		
+        var myChart = echarts.init(document.getElementById('container'));
+	    let option = {
+	        legend: {
+	            data: ['HTMLElement', 'WebGL', 'SVG', 'CSS', 'Other']
+	        },
+	        series: [{
+	            type: 'graph',
+	            layout: 'force',
+	            animation: false,
+	            roam:true,
+	            label: {
+	                position: 'right',
+	                formatter: '{b}'
+	            },
+	            draggable: true,
+	            data: nodesList.nodes,
+	            categories: [],
+	            force: {
+	                edgeLength: 10,
+	                repulsion: 100,
+	                gravity: 0.5
+	            },
+	            edges: nodesList.edges
+	        }]
+	    };
+
+	    myChart.setOption(option);
+	</script>
+</body>
+</html>
