@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="container"></div>
+	<script>
+
+
+		function matchId(selector,dom){
+			return dom.id === selector.replace('#', '');
+		}
+		function matchClass(selector,dom){
+			return element.className.split(/\s+/g).includes(selector.replace('.', ''));
+		}
+		function matchTag(selector, element) {
+		  return element.tagName === selector.toUpperCase()
+		}
+		
+
+		function match(selector,dom){
+			let equals = true;;
+			let selectList = selector.replace(/([\+\>\~])/g,' $1 ').split(/[\t\n\f ]+/g);
+			for(var i = 0; i < selectList.length;i++){
+				let selector = selectList[i];
+				if(!equals) break;
+				if(selector.charAt(0)=='#'){
+					if(i==0){
+						if(selector.match(/\./)){
+							equals = matchId(selector.split('.')[0],dom);
+						}else{
+							equals = matchId(selector,dom);
+						}
+					}
+				}else if(selector.charAt(0)=='.'){
+					if(i==0){
+						if(selector.match(/\./)){
+							equals = matchClass(selector.split('.')[0],dom);
+						}else{
+							equals = matchClass(selector,dom);
+						}
+					}
+				}else {
+					equals matchTag(selector,dom);
+				}
+			}
+
+			getResult(selectList.reverse(),dom);
+		}
+
+		match('div #container>div',document.getElementById('container'));
+	</script>
+</body>
+</html>
