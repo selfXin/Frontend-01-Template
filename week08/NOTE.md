@@ -37,6 +37,10 @@
     * :not
     * :where :has
 + 伪元素
+    * ::after
+    * ::before
+    * ::first-line
+    * ::first-letter
 
 ## 排版
 ### 盒（box)

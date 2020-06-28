@@ -7,6 +7,12 @@
 <body>
 	<div id="container"></div>
 	<script>
+		/**
+		 * 规则：
+		 * 1.匹配最后一位，如果其中包含id，class，tag必须匹配，需要拆解
+		 * 2.下一层级判断选择器/符号，不同的符号有不同的校验规则
+		 * 符号：+～>具有规则
+		 */
 
 
 		function matchId(selector,dom){
