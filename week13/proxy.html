@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		#box {
+			width: 100px;
+			height: 100px;
+			background-color: red;
+		}
+	</style>
+</head>
+<body>
+	<input type="range" id='r' min =0 max=255>
+	<input type="range" id='g' min =0 max=255>
+	<input type="range" id='b' min =0 max=255>
+	<div id="box"></div>
+	<script>
+		let object = {
+			a:1,
+			b:1
+		}
+
+		let handlers = new Map();
+		let reactivities = new Map();
+		let usedReactities = [];
+
+		function reactive(obj){
+			if(reactivities.has(obj)){
+				return reactivities.get(obj);
+			}
+
+			let proxy = new Proxy(obj,{
+				get(obj,prop){
+					usedReactities.push([obj,prop]);
+					return obj[prop];
+				},
+				set(obj,prop,val){
+					obj[prop] = val;
+					if(handlers.get(obj)){
+						if(handlers.get(obj).get(prop)){
+							for(let handler of handlers.get(obj).get(prop))
+									handler();
+						}
+					}
+					return obj[prop];
+				}
+			});
+			reactivities.set(obj,proxy);
+			reactivities.set(proxy,proxy);
+			return proxy;
+		}
+
+		function effect(handler){
+			usedReactities = [];
+			handler();
+			for(let usedReactity of usedReactities){
+				let [obj,prop] = usedReactity;
+				if(!handlers.has(obj)){
+					handlers.set(obj,new Map());
+				}
+				if(!handlers.get(obj).has(prop)){
+					handlers.get(obj).set(prop,[]);
+				}
+				handlers.get(obj).get(prop).push(handler);
+			}
+		}
+
+		let dummy;
+
+		let r = document.getElementById('r');
+		let g = document.getElementById('g');
+		let b = document.getElementById('b');
+		let box = document.getElementById('box');
+		let proxy = reactive({r:0,g:0,b:0});
+		effect(()=>{
+			r.value = proxy.r;
+		})
+		effect(()=>{
+			g.value = proxy.g;
+		})
+		effect(()=>{
+			b.value = proxy.b;
+		})
+		r.addEventListener("input",(event)=>{
+			proxy.r = event.target.value;
+		})
+		g.addEventListener("input",(event)=>{
+			proxy.g = event.target.value;
+		})
+		b.addEventListener("input",(event)=>{
+			proxy.b = event.target.value;
+		});
+
+		effect(()=>{
+			// console.log(proxy)
+			box.style.backgroundColor = `rgb(${proxy.r},${proxy.g},${proxy.b})`;
+		})
+
+	</script>
+</body>
+</html>
