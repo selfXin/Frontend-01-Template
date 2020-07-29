@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		#box {
+			width: 100px;
+			height: 100px;
+			background-color: red;
+		}
+	</style>
+</head>
+<body>
+	<div id="box"></div>
+
+	<script src="gesture.js"></script>
+	<script>
+		let box = document.getElementById('box')
+		enableGesture(document.body);
+
+
+		let x=0,
+			y=0;
+		document.body.addEventListener('pan',(event)=>{
+
+			let mx = x+event.clientX - event.startX,
+				my = y + event.clientY - event.startY;
+				console.log(mx,my)
+			box.style.transform = `translate(${mx}px,${my}px)`
+		})
+		document.body.addEventListener('panend',(event)=>{
+			x = (x + event.clientX - event.startX);
+			y = (y + event.clientY - event.startY)
+			console.log(x,y)
+
+			// let mx = x+event.clientX - event.startX,
+			// 	my = y + event.clientY - event.startY;
+			// 	console.log(mx,my)
+			// box.style.transform = `translate(${mx}px,${my}px)`
+		})
+
+	</script>
+</body>
+</html>
