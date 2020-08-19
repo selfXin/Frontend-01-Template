@@ -71,8 +71,22 @@ module.exports = class extends Generator {
 
 
      this.fs.copyTpl(
-      this.templatePath('webpack.config.js'),
-      this.destinationPath('webpack.config.js')
+      this.templatePath('.nycrc'),
+      this.destinationPath('.nycrc')
+    );
+     this.fs.copyTpl(
+      this.templatePath('.babelrc'),
+      this.destinationPath('.babelrc')
+    );
+
+    this.fs.copyTpl(
+      this.templatePath('main.test.js'),
+      this.destinationPath('test/main.test.js')
+    );
+
+     this.fs.copyTpl(
+      this.templatePath('main.test.js'),
+      this.destinationPath('test/main.test.js')
     );
 
     this.fs.copyTpl(
