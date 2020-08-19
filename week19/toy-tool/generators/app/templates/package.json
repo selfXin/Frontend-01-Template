@@ -1,0 +1,14 @@
+{
+	"name":"<%= title %>",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"author": "",
+	"license": "ISC",
+	"scripts": {
+	    "test": "mocha",
+	    "coverage": "nyc mocha",
+    	"dev": "webpack-dev-server --config webpack.config.js",
+	    "build":"webpack"
+	}
+}
